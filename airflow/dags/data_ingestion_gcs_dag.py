@@ -10,7 +10,6 @@ from airflow.utils.dates import days_ago
 from google.cloud import storage
 
 from airflow import DAG
-from airflow.decorators import task
 
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
 BUCKET = os.environ.get("GCP_GCS_BUCKET")
