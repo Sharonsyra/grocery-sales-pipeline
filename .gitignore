@@ -220,3 +220,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+airflow.sh
+
+/airflow/credentials
