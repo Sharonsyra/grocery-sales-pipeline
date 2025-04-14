@@ -326,19 +326,14 @@ services:
     ports:
       - '8081:8080' # Spark master Web UI
       - '7077:7077' # For spark-node-to-spark-node queries
-      - '4040:4040' # Spark worker data
-      - '8889:8889' # Optionaly - Jupyter web UI
 
   spark-worker:
     container_name: spark-worker
     image: bitnami/spark:3.4
     depends_on:
       - spark-master
-    env_file:
-      - .env
     volumes:
       - ./data:/opt/spark/data
 
 volumes:
   postgres-db-volume:
-  spark-logs:
