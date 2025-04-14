@@ -64,7 +64,6 @@ def upload_to_gcs(bucket, object_directory, local_directory):
 
 default_args = {
     "owner": "airflow",
-    "start_date": days_ago(1),
     "depends_on_past": False,
     "retries": 1,
 }
@@ -72,8 +71,8 @@ default_args = {
 # NOTE: DAG declaration - using a Context Manager (an implicit way)
 with DAG(
         dag_id="data_ingestion_gcs_dag",
-        schedule_interval="@daily",
         default_args=default_args,
+        schedule_interval=None,
         catchup=False,
         max_active_runs=1,
         tags=['grocery-sales'],
@@ -210,68 +209,6 @@ with DAG(
             },
         },
     )
-
-    # @task
-    # def generate_bigquery_tasks():
-    #     client = storage.Client()
-    #     bucket = client.bucket(BUCKET)
-    #     blobs = list(bucket.list_blobs(prefix="raw/"))
-    #
-    #     for blob in blobs:
-    #         if blob.name.endswith('.parquet'):
-    #             file_name = os.path.basename(blob.name)
-    #             table_id = file_name.replace('.parquet', '')
-    #
-    #             BigQueryCreateExternalTableOperator(
-    #                 task_id=f"create_external_table_{table_id}",
-    #                 table_resource={
-    #                     "tableReference": {
-    #                         "projectId": PROJECT_ID,
-    #                         "datasetId": BIGQUERY_DATASET,
-    #                         "tableId": f"{table_id}_external_table",
-    #                     },
-    #                     "externalDataConfiguration": {
-    #                         "sourceFormat": "PARQUET",
-    #                         "sourceUris": [f"gs://{BUCKET}/{blob.name}"],
-    #                     },
-    #                 },
-    #                 dag=dag,  # pass current DAG
-    #             ).execute(context={})  # register task
-    #
-    #
-    # generate_bigquery_tasks = generate_bigquery_tasks()
-
-    # for table_id, file_name in file_table_mapping.items():
-    #     task = BigQueryCreateExternalTableOperator(
-    #         task_id=f"create_external_table_{table_id}",
-    #         table_resource={
-    #             "tableReference": {
-    #                 "projectId": PROJECT_ID,
-    #                 "datasetId": BIGQUERY_DATASET,
-    #                 "tableId": f"{table_id}_external_table",
-    #             },
-    #             "externalDataConfiguration": {
-    #                 "sourceFormat": "PARQUET",
-    #                 "sourceUris": [f"gs://{BUCKET}/raw/{file_name}"],
-    #             },
-    #         },
-    #     )
-    #     external_table_tasks.append(task)
-
-    # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "external_table",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/*.parquet"],
-    #         },
-    #     },
-    # )
 
     download_dataset_task >> unzip_dataset_task >> format_to_parquet_task >> local_to_gcs_task
 

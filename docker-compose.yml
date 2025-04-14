@@ -313,5 +313,32 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  spark-master:
+    container_name: spark-master
+    image: bitnami/spark:3.4
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - ./data:/opt/spark/data
+    ports:
+      - '8081:8080' # Spark master Web UI
+      - '7077:7077' # For spark-node-to-spark-node queries
+      - '4040:4040' # Spark worker data
+      - '8889:8889' # Optionaly - Jupyter web UI
+
+  spark-worker:
+    container_name: spark-worker
+    image: bitnami/spark:3.4
+    depends_on:
+      - spark-master
+    env_file:
+      - .env
+    volumes:
+      - ./data:/opt/spark/data
+
 volumes:
   postgres-db-volume:
+  spark-logs:

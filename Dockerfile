@@ -1,14 +1,11 @@
 FROM apache/airflow:2.10.5
 
-#ENV AIRFLOW_HOME=/opt/airflow
 USER root
 
 # Install unzip
 RUN apt-get update && apt-get install -y unzip && apt-get clean
 
 USER $AIRFLOW_UID
-#apt-get update -qq && apt-get install vim -qqq
-# git gcc g++ -qqq
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -35,10 +32,5 @@ RUN DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/goo
     && rm -rf "${TMP_DIR}" \
     && rm -rf "${GCLOUD_HOME}/.install/.backup/" \
     && gcloud --version
-
-#WORKDIR $AIRFLOW_HOME
-#
-#COPY scripts scripts
-#RUN chmod +x scripts
 
 USER $AIRFLOW_UID
