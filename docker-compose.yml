@@ -92,6 +92,8 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
+  networks:
+    - spark-net
 
 services:
   postgres:
@@ -109,6 +111,8 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+    networks:
+      - spark-net
 
   pgadmin:
     container_name: pgadmin
@@ -121,6 +125,8 @@ services:
     depends_on:
       postgres:
         condition: service_started
+    networks:
+      - spark-net
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change
@@ -136,6 +142,8 @@ services:
       retries: 50
       start_period: 30s
     restart: always
+    networks:
+      - spark-net
 
   airflow-webserver:
     <<: *airflow-common
@@ -261,8 +269,8 @@ services:
           echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
           echo
         fi
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        chmod +x ./add_spark_config.sh
+        "./add_spark_config.sh"
         exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
@@ -313,5 +321,31 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  spark-master:
+    container_name: spark-master
+    image: bitnami/spark:3.2.1
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    ports:
+      - '8081:8080' # Spark master Web UI
+      - '7077:7077' # For spark-node-to-spark-node queries
+    networks:
+      - spark-net
+
+  spark-worker:
+    container_name: spark-worker
+    image: bitnami/spark:3.2.1
+    depends_on:
+      - spark-master
+    networks:
+      - spark-net
+
 volumes:
   postgres-db-volume:
+
+networks:
+  spark-net:
+    driver: bridge

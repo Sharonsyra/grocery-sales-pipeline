@@ -1,36 +1,28 @@
+# --- Stage 1: Get Java 8 from a proper base ---
+FROM eclipse-temurin:8-jdk as java-builder
+
+# --- Stage 2: Build on top of Airflow ---
 FROM apache/airflow:2.10.5
 
 USER root
 
-# Install unzip
+# Install unzip and any other dependencies
 RUN apt-get update && apt-get install -y unzip && apt-get clean
+
+# Copy Java 8 from the previous stage
+COPY --from=java-builder /opt/java/openjdk /opt/java/openjdk
+
+# Set JAVA_HOME and update PATH
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Confirm Java version (optional sanity check)
+RUN java -version
 
 USER $AIRFLOW_UID
 
+COPY airflow/scripts .
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
-
-USER root
-
-ENV GCLOUD_HOME=/opt/google-cloud-sdk
-
-ENV PATH="${GCLOUD_HOME}/bin/:${PATH}"
-
-RUN DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz" \
-    && TMP_DIR="$(mktemp -d)" \
-    && curl -fL "${DOWNLOAD_URL}" --output "${TMP_DIR}/google-cloud-sdk.tar.gz" \
-    && mkdir -p "${GCLOUD_HOME}" \
-    && tar xzf "${TMP_DIR}/google-cloud-sdk.tar.gz" -C "${GCLOUD_HOME}" --strip-components=1 \
-    && "${GCLOUD_HOME}/install.sh" \
-       --bash-completion=false \
-       --path-update=false \
-       --usage-reporting=false \
-       --additional-components alpha beta kubectl \
-       --quiet \
-    && rm -rf "${TMP_DIR}" \
-    && rm -rf "${GCLOUD_HOME}/.install/.backup/" \
-    && gcloud --version
-
-USER $AIRFLOW_UID
