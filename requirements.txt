@@ -5,7 +5,7 @@ celery
 kombu
 tornado
 werkzeug
-pyspark==3.2.1
+pyspark
 SQLAlchemy
 wtforms
 apache-airflow-providers-apache-spark

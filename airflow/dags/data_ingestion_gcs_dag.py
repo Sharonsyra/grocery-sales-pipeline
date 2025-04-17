@@ -84,7 +84,7 @@ with DAG(
 
     unzip_dataset_task = BashOperator(
         task_id='unzip_dataset_task',
-        bash_command=f"unzip {path_to_local_home}/{dataset_file}.zip -d {path_to_local_home}/{dataset_file}"
+        bash_command=f"unzip -o {path_to_local_home}/{dataset_file}.zip -d {path_to_local_home}/{dataset_file}"
     )
 
     format_to_parquet_task = PythonOperator(
@@ -111,7 +111,7 @@ with DAG(
             "tableReference": {
                 "projectId": PROJECT_ID,
                 "datasetId": BIGQUERY_DATASET,
-                "tableId": "categories_external_table",
+                "tableId": "categories_ext",
             },
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",
@@ -126,7 +126,7 @@ with DAG(
             "tableReference": {
                 "projectId": PROJECT_ID,
                 "datasetId": BIGQUERY_DATASET,
-                "tableId": "cities_external_table",
+                "tableId": "cities_ext",
             },
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",
@@ -141,7 +141,7 @@ with DAG(
             "tableReference": {
                 "projectId": PROJECT_ID,
                 "datasetId": BIGQUERY_DATASET,
-                "tableId": "countries_external_table",
+                "tableId": "countries_ext",
             },
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",
@@ -156,7 +156,7 @@ with DAG(
             "tableReference": {
                 "projectId": PROJECT_ID,
                 "datasetId": BIGQUERY_DATASET,
-                "tableId": "customers_external_table",
+                "tableId": "customers_ext",
             },
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",
@@ -171,7 +171,7 @@ with DAG(
             "tableReference": {
                 "projectId": PROJECT_ID,
                 "datasetId": BIGQUERY_DATASET,
-                "tableId": "employees_external_table",
+                "tableId": "employees_ext",
             },
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",
@@ -186,7 +186,7 @@ with DAG(
             "tableReference": {
                 "projectId": PROJECT_ID,
                 "datasetId": BIGQUERY_DATASET,
-                "tableId": "products_external_table",
+                "tableId": "products_ext",
             },
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",
@@ -201,7 +201,7 @@ with DAG(
             "tableReference": {
                 "projectId": PROJECT_ID,
                 "datasetId": BIGQUERY_DATASET,
-                "tableId": "sales_external_table",
+                "tableId": "sales_ext",
             },
             "externalDataConfiguration": {
                 "sourceFormat": "PARQUET",

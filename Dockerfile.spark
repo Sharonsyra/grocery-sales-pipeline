@@ -1,0 +1,14 @@
+FROM bitnami/spark:3.5.5
+
+user root
+
+# Install unzip and any other dependencies
+RUN mkdir -p /var/lib/apt/lists/partial \
+    && apt-get update \
+    && apt-get install -y curl \
+    && apt-get clean
+
+ENV SPARK_HOME=/opt/bitnami/spark
+RUN mkdir -p $SPARK_HOME/jars && \
+    curl -o $SPARK_HOME/jars/gcs-connector-hadoop3-latest.jar https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar && \
+    curl -L -o $SPARK_HOME/jars/spark-bigquery-with-dependencies_2.12-0.36.0.jar https://repo1.maven.org/maven2/com/google/cloud/spark/spark-bigquery-with-dependencies_2.12/0.36.0/spark-bigquery-with-dependencies_2.12-0.36.0.jar

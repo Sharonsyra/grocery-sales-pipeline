@@ -72,8 +72,8 @@ x-airflow-common:
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
-    GOOGLE_APPLICATION_CREDENTIALS: /opt/airflow/credentials/google_credentials.json
-    AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: 'google-cloud-platform://?extra__google_cloud_platform__key_path=/opt/airflow/credentials/google_credentials.json'
+    GOOGLE_APPLICATION_CREDENTIALS: /credentials/google_credentials.json
+    AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: 'google-cloud-platform://?extra__google_cloud_platform__key_path=/credentials/google_credentials.json'
 
     # TODO: Please change GCP_PROJECT_ID & GCP_GCS_BUCKET, as per your config
     GCP_PROJECT_ID: ${GCP_PROJECT_ID}
@@ -83,8 +83,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-.}/credentials:/opt/airflow/credentials:ro
-
+    - ./credentials:/credentials
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -92,6 +91,16 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
+  networks:
+    - spark-net
+
+x-spark-common:
+  &spark-common
+  build:
+    context: .
+    dockerfile: Dockerfile.spark
+  volumes:
+    - ./credentials:/credentials
   networks:
     - spark-net
 
@@ -322,8 +331,8 @@ services:
         condition: service_completed_successfully
 
   spark-master:
+    <<: *spark-common
     container_name: spark-master
-    image: bitnami/spark:3.2.1
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
       interval: 5s
@@ -332,17 +341,17 @@ services:
     ports:
       - '8081:8080' # Spark master Web UI
       - '7077:7077' # For spark-node-to-spark-node queries
-    networks:
-      - spark-net
 
   spark-worker:
+    <<: *spark-common
     container_name: spark-worker
-    image: bitnami/spark:3.2.1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    ports:
+      - '8082:8081'
     depends_on:
       - spark-master
-    networks:
-      - spark-net
-
 volumes:
   postgres-db-volume:
 

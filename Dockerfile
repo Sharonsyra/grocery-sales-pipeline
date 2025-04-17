@@ -16,9 +16,6 @@ COPY --from=java-builder /opt/java/openjdk /opt/java/openjdk
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# Confirm Java version (optional sanity check)
-RUN java -version
-
 USER $AIRFLOW_UID
 
 COPY airflow/scripts .
