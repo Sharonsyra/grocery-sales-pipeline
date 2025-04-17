@@ -34,7 +34,6 @@ spark_transform = SparkSubmitOperator(
         'spark.hadoop.fs.gs.impl': 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem',
         'spark.hadoop.fs.gs.auth.service.account.enable': 'true',
         'spark.hadoop.google.cloud.auth.service.account.json.keyfile': '/credentials/google_credentials.json'
-        # 'spark.driver.bindAddress': '0.0.0.0'
     },
     verbose=True,
     dag=dag,
