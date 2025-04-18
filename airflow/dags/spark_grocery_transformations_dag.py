@@ -25,7 +25,7 @@ common_spark_config = {
 }
 
 with DAG(
-    'spark_grocery_transformations_test',
+    'spark_grocery_transformations',
     default_args=default_args,
     schedule_interval=None,
     catchup=False,
@@ -118,8 +118,7 @@ with DAG(
         **common_spark_config
     )
 
-    # dim_locations >> dim_categories >> dim_employees >> dim_customers >> dim_products >> dim_dates >> fact_sales
-    [dim_products, dim_customers, dim_employees, dim_dates, dim_categories, dim_locations] >> fact_sales
+    dim_locations >> dim_categories >> dim_employees >> dim_customers >> dim_products >> dim_dates >> fact_sales
     fact_sales >> [
         kpi_total_sales,
         kpi_top_products,
