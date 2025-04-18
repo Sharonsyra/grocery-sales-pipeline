@@ -105,95 +105,95 @@ with DAG(
         },
     )
 
-    # bigquery_categories_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_categories_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "categories_ext",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/categories.parquet"],
-    #         },
-    #     },
-    # )
+    bigquery_categories_external_table_task = BigQueryCreateExternalTableOperator(
+        task_id="bigquery_categories_external_table_task",
+        table_resource={
+            "tableReference": {
+                "projectId": PROJECT_ID,
+                "datasetId": BIGQUERY_DATASET,
+                "tableId": "categories_ext",
+            },
+            "externalDataConfiguration": {
+                "sourceFormat": "PARQUET",
+                "sourceUris": [f"gs://{BUCKET}/raw/categories.parquet"],
+            },
+        },
+    )
 
-    # bigquery_cities_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_cities_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "cities_ext",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/cities.parquet"],
-    #         },
-    #     },
-    # )
+    bigquery_cities_external_table_task = BigQueryCreateExternalTableOperator(
+        task_id="bigquery_cities_external_table_task",
+        table_resource={
+            "tableReference": {
+                "projectId": PROJECT_ID,
+                "datasetId": BIGQUERY_DATASET,
+                "tableId": "cities_ext",
+            },
+            "externalDataConfiguration": {
+                "sourceFormat": "PARQUET",
+                "sourceUris": [f"gs://{BUCKET}/raw/cities.parquet"],
+            },
+        },
+    )
 
-    # bigquery_countries_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_countries_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "countries_ext",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/countries.parquet"],
-    #         },
-    #     },
-    # )
+    bigquery_countries_external_table_task = BigQueryCreateExternalTableOperator(
+        task_id="bigquery_countries_external_table_task",
+        table_resource={
+            "tableReference": {
+                "projectId": PROJECT_ID,
+                "datasetId": BIGQUERY_DATASET,
+                "tableId": "countries_ext",
+            },
+            "externalDataConfiguration": {
+                "sourceFormat": "PARQUET",
+                "sourceUris": [f"gs://{BUCKET}/raw/countries.parquet"],
+            },
+        },
+    )
 
-    # bigquery_customers_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_customers_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "customers_ext",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/customers.parquet"],
-    #         },
-    #     },
-    # )
+    bigquery_customers_external_table_task = BigQueryCreateExternalTableOperator(
+        task_id="bigquery_customers_external_table_task",
+        table_resource={
+            "tableReference": {
+                "projectId": PROJECT_ID,
+                "datasetId": BIGQUERY_DATASET,
+                "tableId": "customers_ext",
+            },
+            "externalDataConfiguration": {
+                "sourceFormat": "PARQUET",
+                "sourceUris": [f"gs://{BUCKET}/raw/customers.parquet"],
+            },
+        },
+    )
 
-    # bigquery_employees_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_employees_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "employees_ext",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/employees.parquet"],
-    #         },
-    #     },
-    # )
+    bigquery_employees_external_table_task = BigQueryCreateExternalTableOperator(
+        task_id="bigquery_employees_external_table_task",
+        table_resource={
+            "tableReference": {
+                "projectId": PROJECT_ID,
+                "datasetId": BIGQUERY_DATASET,
+                "tableId": "employees_ext",
+            },
+            "externalDataConfiguration": {
+                "sourceFormat": "PARQUET",
+                "sourceUris": [f"gs://{BUCKET}/raw/employees.parquet"],
+            },
+        },
+    )
 
-    # bigquery_products_external_table_task = BigQueryCreateExternalTableOperator(
-    #     task_id="bigquery_products_external_table_task",
-    #     table_resource={
-    #         "tableReference": {
-    #             "projectId": PROJECT_ID,
-    #             "datasetId": BIGQUERY_DATASET,
-    #             "tableId": "products_ext",
-    #         },
-    #         "externalDataConfiguration": {
-    #             "sourceFormat": "PARQUET",
-    #             "sourceUris": [f"gs://{BUCKET}/raw/products.parquet"],
-    #         },
-    #     },
-    # )
+    bigquery_products_external_table_task = BigQueryCreateExternalTableOperator(
+        task_id="bigquery_products_external_table_task",
+        table_resource={
+            "tableReference": {
+                "projectId": PROJECT_ID,
+                "datasetId": BIGQUERY_DATASET,
+                "tableId": "products_ext",
+            },
+            "externalDataConfiguration": {
+                "sourceFormat": "PARQUET",
+                "sourceUris": [f"gs://{BUCKET}/raw/products.parquet"],
+            },
+        },
+    )
 
     bigquery_sales_external_table_task = BigQueryCreateExternalTableOperator(
         task_id="bigquery_sales_external_table_task",
@@ -212,10 +212,10 @@ with DAG(
 
     download_dataset_task >> unzip_dataset_task >> format_to_parquet_task >> local_to_gcs_task
 
-    # local_to_gcs_task >> bigquery_categories_external_table_task
-    # local_to_gcs_task >> bigquery_cities_external_table_task
-    # local_to_gcs_task >> bigquery_countries_external_table_task
-    # local_to_gcs_task >> bigquery_customers_external_table_task
-    # local_to_gcs_task >> bigquery_employees_external_table_task
-    # local_to_gcs_task >> bigquery_products_external_table_task
+    local_to_gcs_task >> bigquery_categories_external_table_task
+    local_to_gcs_task >> bigquery_cities_external_table_task
+    local_to_gcs_task >> bigquery_countries_external_table_task
+    local_to_gcs_task >> bigquery_customers_external_table_task
+    local_to_gcs_task >> bigquery_employees_external_table_task
+    local_to_gcs_task >> bigquery_products_external_table_task
     local_to_gcs_task >> bigquery_sales_external_table_task

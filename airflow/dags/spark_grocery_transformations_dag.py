@@ -4,7 +4,7 @@ from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOpe
 default_args = {
     'owner': 'airflow',
     'start_date': None,
-    'retries': 2
+    'retries': 3
 }
 
 common_spark_config = {
@@ -13,9 +13,10 @@ common_spark_config = {
     'packages': 'com.google.cloud.spark:spark-3.5-bigquery:0.42.1',
     'jars': 'https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar',
     'conf': {
-        'spark.executor.memory': '4g',
+        'spark.executor.memory': '2g',
         'spark.executor.cores': '2',
-        'spark.driver.cores': '1',
+        'spark.executor.instances': '2',
+        'spark.cores.max': '4',
         'spark.dynamicAllocation.enabled': 'false',
         'spark.hadoop.fs.gs.impl': 'com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem',
         'spark.hadoop.fs.gs.auth.service.account.enable': 'true',
@@ -30,6 +31,11 @@ with DAG(
     schedule_interval=None,
     catchup=False,
 ) as dag:
+    dummy_job = SparkSubmitOperator(
+        task_id='dummy_job_to_help_cache_bigquery',
+        application_args=['--task', 'noop_step_1'],
+        **common_spark_config
+    )
 
     # 🔹 Dim Tables
     dim_products = SparkSubmitOperator(
@@ -118,7 +124,7 @@ with DAG(
         **common_spark_config
     )
 
-    dim_locations >> dim_categories >> dim_employees >> dim_customers >> dim_products >> dim_dates >> fact_sales
+    dummy_job >> [dim_categories, dim_customers, dim_dates, dim_employees, dim_locations, dim_products] >> fact_sales
     fact_sales >> [
         kpi_total_sales,
         kpi_top_products,

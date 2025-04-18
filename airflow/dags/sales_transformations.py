@@ -54,6 +54,8 @@ def products_df(spark):
         types.StructField('VitalityDays', types.DoubleType(), True)
     ])
     products = spark.read.option("header", True).schema(products_schema).parquet(f"{source_path}/products.parquet")
+    products = products.withColumn("ModifyDateSeconds", col("ModifyDate") / 1_000_000_000).cast("double")
+    products = products.withColumn("ModifyTimestamp", from_unixtime(col("ModifyDateSeconds")).cast("timestamp"))
     return products
 
 
@@ -90,8 +92,8 @@ def fact_sales_df(spark):
     products = products_df(spark)
     employees = employees_df(spark)
     customers = customers_df(spark)
-    print(f"sales -> {sales.show()} \n products -> {products.show()} \n "
-          f"customers -> {customers.show()} \n employees -> {employees.show()}")
+    # print(f"sales -> {sales.show()} \n products -> {products.show()} \n "
+    #       f"customers -> {customers.show()} \n employees -> {employees.show()}")
     fact_sales = sales.join(products, "ProductID", "left") \
         .join(customers, "CustomerID", "left") \
         .join(employees, sales["SalesPersonID"] == employees["EmployeeID"], "left") \
@@ -106,7 +108,7 @@ def dim_products_df(spark):
     products = products_df(spark)
     dim_product = products \
         .select("ProductID", "ProductName", "Price", "CategoryID", "Class", "ModifyDate", "Resistant", "IsAllergic",
-                "VitalityDays") \
+                "VitalityDays", "ModifyDateSeconds", "ModifyTimestamp") \
         .dropDuplicates()
     return dim_product
 
@@ -126,7 +128,7 @@ def run_dim_products(spark):
 
 
 def run_dim_customers(spark):
-    print("Running dim_customer transformation...")
+    print("Running dim_customers transformation...")
     customers = customers_df(spark)
     dim_customers = customers \
         .select("CustomerID", "FirstName", "MiddleInitial", "LastName", "CityID", "Address") \
@@ -140,7 +142,7 @@ def run_dim_customers(spark):
 
 
 def run_dim_employees(spark):
-    print("Running dim_employee transformation...")
+    print("Running dim_employees transformation...")
     employees = employees_df(spark)
     dim_employee = employees \
         .select("EmployeeID", "FirstName", "MiddleInitial", "LastName", "Gender", "CityID") \
@@ -154,7 +156,7 @@ def run_dim_employees(spark):
 
 
 def run_dim_dates(spark):
-    print("Running dim_date transformation...")
+    print("Running dim_dates transformation...")
     sales = sales_df(spark)
     dim_date = sales.select("SalesTimestamp") \
         .dropDuplicates() \
@@ -238,7 +240,11 @@ def run_fact_sales(spark):
 # ----------------
 def run_kpi_total_sales_by_date(spark):
     print("Running KPI: total sales by date...")
-    fact_sales = sales_df(spark)
+    # fact_sales = sales_df(spark)
+    fact_sales = spark.read \
+        .format("bigquery") \
+        .option("table", f"{URL}.fact_sales") \
+        .load()
     sales_by_time = fact_sales.groupBy("SalesTimestamp").agg(sum("TotalPrice").alias("TotalSales"))
     sales_by_time.write.format("bigquery") \
         .option("table", f"{URL}.kpi_total_sales_by_date") \
@@ -250,7 +256,11 @@ def run_kpi_total_sales_by_date(spark):
 
 def run_kpi_top_products(spark):
     print("Running KPI: top products...")
-    fact_sales = sales_df(spark)
+    # fact_sales = sales_df(spark)
+    fact_sales = spark.read \
+        .format("bigquery") \
+        .option("table", f"{URL}.fact_sales") \
+        .load()
     top_products = fact_sales.groupBy("ProductID").agg(sum("TotalPrice").alias("Revenue")) \
         .orderBy(col("Revenue").desc())
     top_products.write.format("bigquery") \
@@ -262,7 +272,11 @@ def run_kpi_top_products(spark):
 
 def run_kpi_avg_order_value(spark):
     print("Running KPI: average order value...")
-    fact_sales = sales_df(spark)
+    # fact_sales = sales_df(spark)
+    fact_sales = spark.read \
+        .format("bigquery") \
+        .option("table", f"{URL}.fact_sales") \
+        .load()
     avg_order_value = fact_sales.groupBy("SalesID").agg(sum("TotalPrice").alias("order_total")) \
         .agg({"order_total": "avg"})
     avg_order_value.write.format("bigquery") \
@@ -274,7 +288,11 @@ def run_kpi_avg_order_value(spark):
 
 def run_kpi_customer_type_counts(spark):
     print("Running KPI: customer type counts...")
-    fact_sales = sales_df(spark)
+    # fact_sales = sales_df(spark)
+    fact_sales = spark.read \
+        .format("bigquery") \
+        .option("table", f"{URL}.fact_sales") \
+        .load()
     first_purchase = fact_sales.groupBy("CustomerID").agg(min("SalesTimestamp").alias("FirstPurchaseDate"))
 
     sales_with_customer_status = fact_sales.join(first_purchase, "CustomerID") \
@@ -294,8 +312,12 @@ def run_kpi_customer_type_counts(spark):
 
 def run_kpi_price_trends(spark):
     print("Running KPI: price trends...")
-    dim_products = dim_products_df(spark)
-    price_trends = dim_products.withColumn("month", month("ModifyDate")) \
+    # dim_products = dim_products_df(spark)
+    dim_products = spark.read \
+        .format("bigquery") \
+        .option("table", f"{URL}.dim_products") \
+        .load()
+    price_trends = dim_products.withColumn("month", month("ModifyTimestamp")) \
         .groupBy("CategoryID", "month") \
         .agg(avg("Price").alias("avg_price"))
 
@@ -308,7 +330,11 @@ def run_kpi_price_trends(spark):
 
 def run_kpi_sales_by_employee(spark):
     print("Running KPI: sales by employee...")
-    fact_sales = sales_df(spark)
+    # fact_sales = sales_df(spark)
+    fact_sales = spark.read \
+        .format("bigquery") \
+        .option("table", f"{URL}.fact_sales") \
+        .load()
     sales_by_employee = fact_sales.groupBy("EmployeeID") \
         .agg(sum("TotalPrice").alias("employee_sales"))
 
@@ -321,7 +347,11 @@ def run_kpi_sales_by_employee(spark):
 
 def run_kpi_employee_daily_sales(spark):
     print("Running KPI: employee daily sales...")
-    fact_sales = sales_df(spark)
+    # fact_sales = sales_df(spark)
+    fact_sales = spark.read \
+        .format("bigquery") \
+        .option("table", f"{URL}.fact_sales") \
+        .load()
     employee_daily_sales = fact_sales.groupBy("EmployeeID", "SalesTimestamp") \
         .agg(sum("TotalPrice").alias("daily_revenue"))
 

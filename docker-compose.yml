@@ -339,14 +339,21 @@ services:
       - '8081:8080' # Spark master Web UI
       - '7077:7077' # For spark-node-to-spark-node queries
 
-  spark-worker:
+  spark-worker-1:
     <<: *spark-common
-    container_name: spark-worker
+    container_name: spark-worker-1
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
-    ports:
-      - '8082:8081'
+    depends_on:
+      - spark-master
+
+  spark-worker-2:
+    <<: *spark-common
+    container_name: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
     depends_on:
       - spark-master
 
