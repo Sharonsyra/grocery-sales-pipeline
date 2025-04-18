@@ -74,10 +74,9 @@ x-airflow-common:
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
     GOOGLE_APPLICATION_CREDENTIALS: /credentials/google_credentials.json
     AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: 'google-cloud-platform://?extra__google_cloud_platform__key_path=/credentials/google_credentials.json'
-
-    # TODO: Please change GCP_PROJECT_ID & GCP_GCS_BUCKET, as per your config
     GCP_PROJECT_ID: ${GCP_PROJECT_ID}
     GCP_GCS_BUCKET: ${GCP_GCS_BUCKET}
+    BIGQUERY_DATASET: ${BIGQUERY_DATASET}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -96,9 +95,7 @@ x-airflow-common:
 
 x-spark-common:
   &spark-common
-  build:
-    context: .
-    dockerfile: Dockerfile.spark
+  image: bitnami/spark:3.5.5
   volumes:
     - ./credentials:/credentials
   networks:
@@ -352,6 +349,7 @@ services:
       - '8082:8081'
     depends_on:
       - spark-master
+
 volumes:
   postgres-db-volume:
 
