@@ -150,33 +150,19 @@ Password: airflow
 
 Connect to the following tables in BigQuery for visualization:
 
-- `kpi_top_products`
-- `kpi_total_sales_by_date`
+- `fact_sales`
 
 ### Suggested Charts
 
-#### 📈 Sales Over Time
+#### 📈 Sales Dashboard
 
-- **Chart**: Time Series  
-- **Dimension**: `sale_date`  
-- **Metric**: `total_sales`  
+https://lookerstudio.google.com/s/vzCIMs1DR7k
 
-#### 🥇 Top Products
-
-- **Chart**: Bar Chart  
-- **Dimension**: `product_name`  
-- **Metric**: `total_sales`  
-
-#### 🧺 Quantity vs Sales
-
-- **Chart**: Scatter or Combo  
-- **Dimensions**: `product_name`  
-- **Metrics**: `quantity_sold`, `total_sales`
 
 > 📌 Screenshots of dashboards go here:
 
-![Daily Sales Trend](screenshots/daily_sales_trend.png)  
-![Top Products](screenshots/top_products_bar_chart.png)
+![Sales_Chart_1](screenshots/sales_chart_1.png)  
+![Sales_Chart_2](screenshots/sales_chart_2.png)
 
 ---
 
